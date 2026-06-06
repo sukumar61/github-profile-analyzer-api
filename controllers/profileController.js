@@ -1,16 +1,53 @@
 import axios from "axios";
+import pool from "../config/db.js"
 
 export const analyzeProfile=async (req,res)=>{
 
     try{
     const {username}=req.body
+    if (!username || username.trim() === '') {
+      return res.status(400).json({
+        success: false,
+        message: 'GitHub username is required',
+      })
+    }
     const result=await axios.get(`https://api.github.com/users/${username}`)
+    const{login,name,public_repos,followers,following,avatar_url,html_url}=result.data
+    await pool.execute(`INSERT INTO github_profiles
+   (
+     username,
+     name,
+     followers,
+     following,
+     public_repos,
+     avatar_url,
+     profile_url
+   )
+   VALUES (?, ?, ?, ?, ?, ?, ?);`,[login,name,followers,following,public_repos,avatar_url,html_url])
+    
     res.status(200).json(result.data)
     }
     catch(err){
         console.log(err.message)
         res.status(500).json({message:"Failed to fetch github profile"})
     }
-
-
+}
+export const getAllProfiles=async(req,res)=>{
+    try{
+        const [profiles]=await pool.execute("select * from github_profiles")
+        return res.status(200).json({
+      success: true,
+      count: profiles.length,
+      data: profiles,
+    })
+        
+        
+    }
+    catch(error){
+         console.error(error.message)
+    return res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+    })
+    }
 }
