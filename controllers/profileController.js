@@ -51,3 +51,32 @@ export const getAllProfiles=async(req,res)=>{
     })
     }
 }
+
+export const getProfileById=async(req,res)=>{
+    try{
+        const {id}=req.params
+        if (!id || Number.isNaN(Number(id))) {
+      return res.status(400).json({
+        success: false,
+        message: 'Valid profile id is required',
+      })
+    }
+    const [profile]=await pool.execute("select * from github_profiles where id=?;",[id])
+    if (profile.length===0){
+        return res.status(404).json({
+        success: false,
+        message: 'Profile not found',
+      })
+    }
+     return res.status(200).json({
+      success: true,
+      data: profile[0]
+    })
+
+    }
+    catch(error){
+        console.log(error.message)
+        res.status(500).json({ success: false,
+      message: 'Internal server error'})
+    }
+}
