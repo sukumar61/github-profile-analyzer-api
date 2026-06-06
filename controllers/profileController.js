@@ -11,8 +11,23 @@ export const analyzeProfile=async (req,res)=>{
         message: 'GitHub username is required',
       })
     }
+
+
     const result=await axios.get(`https://api.github.com/users/${username}`)
     const{login,name,public_repos,followers,following,avatar_url,html_url}=result.data
+
+
+        const [existingProfile] = await pool.execute(
+            'SELECT id FROM github_profiles WHERE username = ?',
+                    [login]
+         )
+    if(existingProfile.length > 0) {
+        return res.status(409).json({
+            success: false,
+        message: 'Profile already analyzed',
+            })
+        }
+
     await pool.execute(`INSERT INTO github_profiles
    (
      username,
@@ -27,8 +42,14 @@ export const analyzeProfile=async (req,res)=>{
     
     res.status(200).json(result.data)
     }
-    catch(err){
-        console.log(err.message)
+    catch(error){
+        console.log(error.message)
+        if (error.response?.status === 404) {
+    return res.status(404).json({
+      success: false,
+      message: 'GitHub user not found',
+    })
+  }
         res.status(500).json({message:"Failed to fetch github profile"})
     }
 }
