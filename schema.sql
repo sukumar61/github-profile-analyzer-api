@@ -9,4 +9,4 @@ CREATE TABLE github_profiles (
     profile_url TEXT,
     analyzed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id)
-);gi
+);
