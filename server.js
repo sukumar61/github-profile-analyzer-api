@@ -1,5 +1,8 @@
 import dotenv from 'dotenv'
 import app from './app.js'
+import express from "express"
+
+app.use(express.json())
 
 dotenv.config()
 
