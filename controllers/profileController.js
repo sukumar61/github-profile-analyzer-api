@@ -43,7 +43,7 @@ export const analyzeProfile=async (req,res)=>{
     res.status(200).json({
   success: true,
   message: "Profile analyzed successfully",
-  data: profile,
+  data: result.data,
 })
     }
     catch(error){
