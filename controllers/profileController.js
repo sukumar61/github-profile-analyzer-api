@@ -40,7 +40,11 @@ export const analyzeProfile=async (req,res)=>{
    )
    VALUES (?, ?, ?, ?, ?, ?, ?);`,[login,name,followers,following,public_repos,avatar_url,html_url])
     
-    res.status(200).json(result.data)
+    res.status(200).json({
+  success: true,
+  message: "Profile analyzed successfully",
+  data: profile,
+})
     }
     catch(error){
         console.log(error.message)
